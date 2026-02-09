@@ -52,12 +52,35 @@
 - [ ] Traduzir Dashboard, Alerts, Cases, Assets (partial - traduzido na página Settings)
 
 ### ⏳ Testing
-- [ ] Unit tests
-- [ ] Integration tests
+- [x] Unit tests ✅ FEITO!
+- [x] Integration tests ✅ FEITO!
 
 ---
 
 ## 📋 Tarefas Concluídas Recentemente
+
+### ✅ Test Suite Completa (NOVO!)
+**Backend (pytest):**
+- `backend/tests/conftest.py` - Fixtures para testes
+- `backend/tests/test_auth.py` - JWT, password hashing
+- `backend/tests/test_rbac.py` - RBAC middleware, permissions
+- `backend/tests/test_tenant.py` - Tenant isolation, hierarchy
+- `backend/tests/test_inventory.py` - AI service, inventory processing
+- `backend/tests/test_integrations.py` - Slack, Jira, VirusTotal, MISP
+
+**Frontend (vitest):**
+- `frontend/vitest.config.ts` - Configuração
+- `frontend/src/__tests__/i18n.test.ts` - 100+ translation tests
+- `frontend/src/__tests__/components.test.tsx` - Component tests
+
+**Cobertura:**
+- Auth: password hashing, JWT tokens
+- RBAC: permissions, decorators, resource access
+- Tenant: hierarchy, filtering, context
+- Inventory: AI analysis, webhook processing
+- Integrations: all service methods
+
+---
 
 ### RBAC Middleware
 ```python
