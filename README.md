@@ -150,7 +150,7 @@ siem/
 
 ```bash
 # Clone e setup
-git clone https://github.com/your-org/siem.git
+git clone https://github.com/isaacasimovfilho/UnderSight.git
 cd siem
 
 # Backend
