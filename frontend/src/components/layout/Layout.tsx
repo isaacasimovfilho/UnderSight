@@ -6,20 +6,19 @@ import {
   Bell,
   FolderOpen,
   HardDrive,
+  Bot,
   Settings,
   LogOut,
   Shield,
   Menu,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useState } from 'react'
-import { useAuthStore } from '@/stores/auth'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Alerts', href: '/alerts', icon: Bell },
   { name: 'Cases', href: '/cases', icon: FolderOpen },
   { name: 'Assets', href: '/assets', icon: HardDrive },
+  { name: 'Inventory', href: '/inventory', icon: Bot },
   { name: 'Settings', href: '/settings', icon: Settings },
 ]
 

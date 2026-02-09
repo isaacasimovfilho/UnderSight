@@ -9,6 +9,8 @@ import Alerts from '@/pages/Alerts'
 import Cases from '@/pages/Cases'
 import Assets from '@/pages/Assets'
 import Settings from '@/pages/Settings'
+import Inventory from '@/pages/Inventory'
+import InventorySettings from '@/pages/InventorySettings'
 import Login from '@/pages/Login'
 
 // Layout
@@ -58,6 +60,8 @@ function App() {
             <Route path="alerts" element={<Alerts />} />
             <Route path="cases" element={<Cases />} />
             <Route path="assets" element={<Assets />} />
+            <Route path="inventory" element={<Inventory />} />
+            <Route path="inventory/settings" element={<InventorySettings />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
