@@ -10,7 +10,7 @@
 - [x] Multitenant Schema
 - [x] Multitenant Models
 - [x] i18n Backend (EN, PT, ES)
-- [x] i18n Frontend
+- [x] i18n Frontend (100+ traduções)
 - [x] Docker Dev com bind mounts
 - [x] Settings Page com integrações
 - [x] Módulo de Inventário com IA
@@ -40,18 +40,50 @@
   - Hierarquia: Root → Provider → Customer → Sub-customer
   - Filtros automáticos por tenant
 
-### 4. Frontend i18n
-- [ ] Traduzir Dashboard, Alerts, Cases, Assets
+### ✅ Integrações Backend (NOVO!)
+- [x] `backend/app/services/integrations/__init__.py`
+  - **SlackService** - Enviar alertas
+  - **JiraService** - Criar tickets
+  - **VirusTotalService** - Enrichment de ameaças
+  - **MISPService** - Plataforma de threat intelligence
+  - **IntegrationManager** - Enviar para todos
 
-### 5. Integrações Backend
-- [ ] SlackService - Deixar configuração na Settings
-- [ ] JiraService - Deixar configuração na Settings
-- [ ] VirusTotalService - Deixar configuração na Settings
-- [ ] MISPService - Deixar configuração na Settings
+### ⏳ Frontend i18n
+- [ ] Traduzir Dashboard, Alerts, Cases, Assets (partial - traduzido na página Settings)
 
-### 6. Testing
+### ⏳ Testing
 - [ ] Unit tests
 - [ ] Integration tests
+
+---
+
+## 📋 Tarefas Concluídas Recentemente
+
+### RBAC Middleware
+```python
+# Uso:
+@router.get("/alerts")
+async def get_alerts(
+    current_user: User = Depends(get_current_user),
+    _ = Depends(require_permission(Permissions.ALERTS_READ))
+):
+    return {"alerts": []}
+```
+
+### Tenant Isolation
+```python
+# Hierarquia:
+# Root → Provider → Customer → Sub-customer
+# Cada nível só vê seus filhos
+```
+
+### Integrações
+| Serviço | Configuração |
+|---------|-------------|
+| Slack | webhook_url, api_key |
+| Jira | api_url, api_key, project_key |
+| VirusTotal | api_url, api_key |
+| MISP | api_url, api_key, verify_ssl |
 
 ---
 
