@@ -13,6 +13,7 @@
 - [x] i18n Frontend
 - [x] Docker Dev com bind mounts
 - [x] Settings Page com integrações
+- [x] Módulo de Inventário com IA
 
 ## 🔧 Em Andamento
 
@@ -20,60 +21,37 @@
 
 ### 📦 MÓDULO DE INVENTÁRIO (NOVO!)
 - [x] **Schema PostgreSQL** - `03-inventory.sql`
-  - Tabela inventory_items
-  - Tabela inventory_ai_logs
-  - Tabela inventory_ai_configs
-  - Tabela inventory_rules
-  - Tabela inventory_sources
+- [x] **Serviço de IA** - `inventory.py`
+- [x] **API Endpoints** - `inventory.py`
+- [x] **Frontend Pages** - Inventory.tsx, InventorySettings.tsx
+- [x] **Integração N8N** - Webhook `/api/v1/inventory/webhook/n8n`
 
-- [x] **Serviço de IA** - `backend/app/services/inventory.py`
-  - Classe AIService com suporte a OpenAI, Anthropic, Ollama, Groq, DeepSeek
-  - Classe InventoryService para processamento
-  - Prompt template configurável
-  - Decisões: approve, reject, pending, flag
+### ✅ RBAC Middleware (NOVO!)
+- [x] `backend/app/core/middlewares/rbac.py`
+  - Classe `RBACMiddleware`
+  - Funções: `require_permission`, `require_any_permission`, `require_all_permissions`
+  - Permissões granulares por recurso
+  - Mapeamento de roles: admin, analyst, viewer
 
-- [x] **API Endpoints** - `backend/app/api/v1/inventory.py`
-  - POST /webhook/n8n - Receber dados do N8N
-  - GET /items - Listar inventário
-  - POST /items/{id}/approve - Aprovar item
-  - POST /items/{id}/reject - Rejeitar item
-  - GET/ PUT /config - Configuração de IA
-  - POST /config/test - Testar configuração
-
-- [x] **Frontend Pages**
-  - `frontend/src/pages/Inventory.tsx` - Página de inventário
-  - `frontend/src/pages/InventorySettings.tsx` - Configuração de IA
-
-- [x] **Integração N8N**
-  - Webhook URL: `/api/v1/inventory/webhook/n8n`
-  - Formato JSON esperado
-  - Variáveis disponíveis no prompt
-
-### 2. RBAC Avançado (Parcial)
-- [ ] Middleware de verificação de permissões
-- [ ] Decorators para endpoints
-- [ ] Permissões granulares por recurso
-
-### 3. Tenant Isolation
-- [ ] Middleware para filtrar dados por tenant
-- [ ] Query filters automáticos
-- [ ] Super admin bypass
+### ✅ Tenant Isolation (NOVO!)
+- [x] `backend/app/core/middlewares/tenant.py`
+  - Classe `TenantContext`
+  - Classe `TenantIsolationMiddleware`
+  - Hierarquia: Root → Provider → Customer → Sub-customer
+  - Filtros automáticos por tenant
 
 ### 4. Frontend i18n
-- [ ] Traduzir todas as páginas (Dashboard, Alerts, Cases, Assets)
-- [ ] Currency/date formatting por idioma
-- [ ] Mensagens de erro localizadas
+- [ ] Traduzir Dashboard, Alerts, Cases, Assets
 
 ### 5. Integrações Backend
-- [ ] SlackService
-- [ ] JiraService
-- [ ] VirusTotalService
-- [ ] MISPService
+- [ ] SlackService - Deixar configuração na Settings
+- [ ] JiraService - Deixar configuração na Settings
+- [ ] VirusTotalService - Deixar configuração na Settings
+- [ ] MISPService - Deixar configuração na Settings
 
 ### 6. Testing
-- [ ] Unit tests para models
-- [ ] Integration tests para API
-- [ ] E2E tests com Playwright
+- [ ] Unit tests
+- [ ] Integration tests
 
 ---
 
