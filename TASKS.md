@@ -55,6 +55,59 @@
 - [x] Unit tests ✅ FEITO!
 - [x] Integration tests ✅ FEITO!
 
+### ⏳ Produção
+- [x] **docker-compose.prod.yml** - Configuração de produção
+- [x] **Dockerfile.prod** - Backend otimizado (gunicorn, non-root)
+- [x] **nginx/nginx.conf** - Reverse proxy
+- [x] **.env.prod.example** - Variáveis de ambiente
+- [x] **deploy.sh** - Script de deploy automatizado
+- [x] **backup.sh** - Script de backup
+- [x] **PRODUCTION.md** - Documentação de produção
+
+---
+
+## 🚀 Deploy em Produção
+
+### Quick Start
+
+```bash
+# 1. Configurar variáveis de ambiente
+cp .env.prod.example .env.prod
+nano .env.prod
+
+# 2. Executar deploy
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### URLs após deploy
+
+| Serviço | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| API | http://localhost:8000 |
+| API Docs | http://localhost:8000/docs |
+| OpenSearch | http://localhost:9200 |
+| Dashboards | http://localhost:5601 |
+
+### Recursos Incluídos
+
+- **Resource limits** por serviço
+- **Health checks** configurados
+- **Containers non-root** (segurança)
+- **Nginx reverse proxy**
+- **Suporte SSL** (documentado)
+- **Backup automatizado**
+- **Logs rotacionados**
+
+### Requisitos Mínimos
+
+| Recurso | Mínimo | Recomendado |
+|---------|--------|-------------|
+| CPU | 2 cores | 4+ cores |
+| Memória | 4 GB | 8+ GB |
+| Storage | 50 GB | 100+ GB SSD |
+
 ---
 
 ## 📋 Tarefas Concluídas Recentemente
