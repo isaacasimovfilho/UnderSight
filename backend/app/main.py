@@ -1,8 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
+from app.core.security import decode_access_token
+from app.core.middlewares import TenantContext
 from app.api import router as api_router
 
 
@@ -25,10 +27,31 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     
+    # Tenant Middleware
+    @app.middleware("http")
+    async def tenant_context_middleware(request: Request, call_next):
+        # Extract token from header
+        token = request.headers.get("Authorization")
+        
+        if token and token.startswith("Bearer "):
+            try:
+                payload = decode_access_token(token.replace("Bearer ", ""))
+                if payload:
+                    TenantContext.set(
+                        tenant_id=payload.get("tenant_id", "default"),
+                        tenant_type=payload.get("tenant_type", "customer")
+                    )
+            except Exception:
+                pass
+        
+        response = await call_next(request)
+        TenantContext.clear()
+        return response
+    
     # Include routers
     app.include_router(api_router, prefix="/api/v1")
     
-    # Health check
+    # Health check (public)
     @app.get("/health")
     async def health_check():
         return {
