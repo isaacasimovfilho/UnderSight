@@ -91,8 +91,8 @@ export default function InventoryPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline className="h">
-            <Upload-4 w-4 mr-2" />
+          <Button variant="outline" className="h">
+            <Upload className="h-4 w-4 mr-2" />
             Import from N8N
           </Button>
           <Button>
