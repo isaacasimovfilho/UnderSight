@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { useLanguageSelector } from '@/components/LanguageSelector'
-import { Settings, Globe, Shield, Key, Webhook, Bell, Database, Save } from 'lucide-react'
+import { Save } from 'lucide-react'
+import { useLanguage } from '@/components/LanguageSelector'
+import { Settings, Globe, Shield, Key, Webhook, Bell, Cloud } from 'lucide-react'
+
+// Azure Sentinel Settings Component
+import AzureSentinelSettings from '@/components/settings/AzureSentinelSettings'
 
 // Integration placeholder configuration
 interface IntegrationConfig {
@@ -19,13 +22,14 @@ interface IntegrationConfig {
 
 export default function SettingsPage() {
   const { t } = useTranslation()
-  const { currentLang, setLanguage } = useLanguageSelector()
+  const { currentLanguage, changeLanguage } = useLanguage()
   const [activeTab, setActiveTab] = useState('general')
+  const [azureExpanded, setAzureExpanded] = useState(false)
   
   // State for settings
   const [settings, setSettings] = useState({
     theme: 'dark',
-    language: currentLang.code,
+    language: currentLanguage,
     timezone: 'America/Sao_Paulo',
     email_notifications: true,
     slack_webhook: '',
@@ -98,7 +102,7 @@ export default function SettingsPage() {
                   value={settings.language}
                   onChange={(e) => {
                     setSettings({ ...settings, language: e.target.value })
-                    setLanguage(e.target.value)
+                    changeLanguage(e.target.value)
                   }}
                   className="w-full h-10 px-3 border rounded-md bg-background"
                 >
@@ -152,6 +156,40 @@ export default function SettingsPage() {
       {/* Integrations Settings */}
       {activeTab === 'integrations' && (
         <div className="grid gap-4 md:grid-cols-2">
+          {/* Azure Sentinel */}
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-600 rounded-lg">
+                    <Cloud className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Microsoft Azure Sentinel</CardTitle>
+                    <CardDescription>
+                      Collect security events from Microsoft Sentinel
+                    </CardDescription>
+                  </div>
+                </div>
+                <Badge variant="secondary">Cloud</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {azureExpanded ? (
+                <AzureSentinelSettings />
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    <p>Configure Azure Sentinel integration to collect security events</p>
+                  </div>
+                  <Button onClick={() => setAzureExpanded(true)}>
+                    Configure
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Slack */}
           <Card>
             <CardHeader>

@@ -1,14 +1,14 @@
 version: '3.8'
 
 services:
-  # PostgreSQL - Database for configurations
+  # PostgreSQL - Database
   postgres:
     image: postgres:15-alpine
     container_name: siem-postgres
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-siem}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-siem}
-      - POSTGRES_DB=${POSTGRES_DB:-siem_platform}
+      - POSTGRES_USER=siem
+      - POSTGRES_PASSWORD=siem
+      - POSTGRES_DB=siem_platform
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
@@ -17,87 +17,10 @@ services:
     networks:
       - siem-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-siem} -d ${POSTGRES_DB:-siem_platform}"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD-SHELL", "pg_isready -U siem -d siem_platform"]
+      interval: 10s
+      timeout: 5s
       retries: 5
-
-  # OpenSearch - Logs and events storage
-  opensearch:
-    image: opensearchproject/opensearch:latest
-    container_name: siem-opensearch
-    environment:
-      - cluster.name=siem-cluster
-      - node.name=opensearch-node-1
-      - bootstrap.memory_lock=true
-      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
-      - discovery.type=single-node
-      - DISABLE_INSTALL_DEMO_CONFIG=true
-      - DISABLE_SECURITY_PLUGIN=true
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - opensearch-data:/usr/share/opensearch/data
-    ports:
-      - "9200:9200"
-      - "9600:9600"
-    networks:
-      - siem-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  # OpenSearch Dashboards
-  opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:latest
-    container_name: siem-dashboards
-    environment:
-      - OPENSEARCH_HOSTS=http://opensearch:9200
-      - DISABLE_SECURITY=true
-    ports:
-      - "5601:5601"
-    volumes:
-      - ./frontend/nginx.conf:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml
-    networks:
-      - siem-network
-    depends_on:
-      - opensearch
-
-  # Kafka - Message queue
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    container_name: siem-kafka
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_LOG_RETENTION_HOURS=168
-    ports:
-      - "9092:9092"
-    volumes:
-      - kafka-data:/var/lib/kafka
-    networks:
-      - siem-network
-    depends_on:
-      - zookeeper
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: siem-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-    volumes:
-      - zookeeper-data:/var/lib/zookeeper
-    networks:
-      - siem-network
 
   # Redis - Cache and sessions
   redis:
@@ -112,19 +35,30 @@ services:
 
   # Backend API - Development with hot reload
   backend:
-    image: python:3.11-slim
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
     container_name: siem-backend
     working_dir: /app
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-siem}:${POSTGRES_PASSWORD:-siem}@postgres:5432/${POSTGRES_DB:-siem_platform}
-      - OPENSEARCH_URL=http://opensearch:9200
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - DATABASE_URL=postgresql://siem:siem@postgres:5432/siem_platform
+      - OPENSEARCH_URL=http://host.docker.internal:9200
       - REDIS_URL=redis://redis:6379
       - SIEM_ENV=development
       - PYTHONPATH=/app
+      # Azure Sentinel - Configure via .env file
+      # - AZURE_TENANT_ID=your-tenant-id
+      # - AZURE_CLIENT_ID=your-client-id
+      # - AZURE_CLIENT_SECRET=your-client-secret
+      # - AZURE_SUBSCRIPTION_ID=your-subscription-id
+      # - AZURE_WORKSPACE_NAME=your-workspace
+      # - AZURE_SYNC_ENABLED=true
+      # - AZURE_SYNC_INTERVAL=60
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./backend:/app
-      - backend-venv:/venv
+      - backend-venv:/app/.venv
     ports:
       - "8000:8000"
     networks:
@@ -132,19 +66,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      opensearch:
-        condition: service_healthy
-      kafka:
-        condition: service_started
       redis:
         condition: service_started
-    command: >
-      bash -c "pip install -q uvicorn fastapi sqlalchemy psycopg2-binary pydantic python-jose bcrypt httpx loguru &&
-               uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   # Frontend - Development with Vite
   frontend:
-    image: node:20-alpine
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
     container_name: siem-frontend
     working_dir: /app
     environment:
@@ -158,8 +87,6 @@ services:
       - siem-network
     depends_on:
       - backend
-    command: >
-      bash -c "npm install && npm run dev -- --host 0.0.0.0"
 
 networks:
   siem-network:
@@ -167,9 +94,6 @@ networks:
 
 volumes:
   postgres-data:
-  opensearch-data:
-  kafka-data:
-  zookeeper-data:
   redis-data:
   backend-venv:
   frontend-node_modules:
